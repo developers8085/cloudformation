@@ -35,5 +35,5 @@ Resources:
             Resource: '*'
 Outputs:
   pPolicyARN:
-    Description: Arn for Policy
+    Description: 'Arn for Policy'
     Value: !Ref pPolicy
