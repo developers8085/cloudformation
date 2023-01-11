@@ -1,0 +1,39 @@
+iAWSTemplateFormatVersion: '2010-09-09'
+Description: 'v1.0.2022 - Cloudformation Read Only Policy'
+Metadata:
+  Policy : 
+    Description: 'This policy about Cloudformation Read Only'
+  Role :
+    Description: 'Assumed in Role'
+  Instances: 
+    Description: 'This role attached to ec2 instance'
+Parameters:
+  pPolicyName:
+    Description: Name of The Policy
+    Type: String
+  pEnv:
+    Description: "Environment Label. Must be on of these prod, qa, dev, build, nonprod. Everything also need to be lowercase."
+    Type: String
+    AllowedValues:
+    - dev
+    - qa
+    - prod
+Resources:
+  pPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Name: !Ref pPolicyName
+      Description: 'This is a Read only policy for cloudformation'
+      PolicyDocument :
+        Version: "2012-10-17"
+        Statement :
+          - Effect: Allow
+            Action :
+              - 'cloudformation:Describe*'
+              - 'cloudformation:List*'
+              - 'cloudformation:Get*'
+            Resource: '*'
+Outputs:
+  pPolicyARN:
+    Description: Arn for Policy
+    Value: !Ref pPolicy
