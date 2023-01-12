@@ -22,8 +22,8 @@ Resources:
   pPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      Name: !Ref pPolicyName
-      Description: 'This is a Read only policy for cloudformation'
+      PolicyName: !Ref pPolicyName
+      #Description: 'This is a Read only policy for cloudformation'
       PolicyDocument :
         Version: "2012-10-17"
         Statement :
