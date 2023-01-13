@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Main Template For Resources
+Resources:
+  vpcId:
+    Type: 'AWS::CloudFormation::Stack'
+    Description: VPC Creation 
+    Properties:
+      TemplateURL: !Sub 'https://s3.amazonaws.com/${!Ref BucketName}/VPC.yaml'
+  EC2InstanceId: 
+    Type: 'AWS::CloudFormation::Stack'
+    Description: EC2 Instance Creation
+    Properties:
+      TemplateURL: !Sub 'https://s3.amazonaws.com/${!Ref BucketName}/ec2.yaml'
