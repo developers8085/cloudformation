@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'AWS CloudFormation Template for subnets'
+Parameters:
+  VpcId: 
+    Description: VPC Id
+    Type: String
+    Default: vpc-0bb3a31bc846d0696
+  SubnetCICR: 
+    Description : Subnet CICR
+    Type: String
+    Default: 172.31.36.0/24
+  InternetGateWay :
+    Description : InternetGateWay Id
+    Type: String
+    Default: igw-062c726885f9e36f2
+Resources: 
+  SubnetId :
+    Type: AWS::EC2::Subnet
+    Properties :
+      VpcId: !Ref VpcId
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref SubnetCICR
+      MapPublicIpOnLaunch: false
+      Tags: 
+       - Key: Name
+         value : Public Subnet (AZ1)
+  RouteTable: 
+    Type:  AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: Public Routes
+  PublicRoute: 
+    Type : AWS::EC2::Route
+    Properties: 
+      RouteTableId : !Ref RouteTable
+      DestinationCidrBlock : 0.0.0.0/0
+      GatewayId : !Ref InternetGateWay
+  Subnet1RouteTableAssociation :
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties :
+      RouteTableId : !Ref RouteTable
+      SubnetId : !Ref SubnetId
+      

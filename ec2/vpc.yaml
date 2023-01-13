@@ -3,6 +3,7 @@ Parameters:
   EnvironmentName:
     Description: An environment name that is prefixed to resource names
     Type: String
+    Default: dev
   VpcCIDR:
     Description: Please enter the IP range (CIDR notation) for this VPC
     Type: String
@@ -174,21 +175,21 @@ Outputs:
   VPC:
     Description: A reference to the created VPC
     Value: !Ref VPC
-  VPCExport:
-    Description: A VPC reference for another stack
-    Value: !Ref
-    Export: 
-      Name : VPCId
-  PrivateSubnetExport:
-    Description: private Subnet exported for another stack
-    Value: !Ref PrivateSubnet1
-    Export:
-      Name : PrivateSubnetExport
-  PublicSubnetExport:
-    Description: private Subnet exported for another stack
-    Value: !Ref PublicSubnet1
-    Export:
-      Name : PublicSubnetExport
+      #VPCExport:
+      #Description: A VPC reference for another stack
+      #Value: !Ref
+      #Export: 
+      #Name : VPCId
+      #PrivateSubnetExport:
+      #Description: private Subnet exported for another stack
+      #Value: !Ref PrivateSubnet1
+      #Export:
+      #Name : PrivateSubnetExport
+        #PublicSubnetExport:
+        #Description: private Subnet exported for another stack
+        #Value: !Ref PublicSubnet1
+        #Export:
+        #Name : PublicSubnetExport
   PublicSubnets:
     Description: A list of the public subnets
     Value: !Join [ ",", [ !Ref PublicSubnet1, !Ref PublicSubnet2 ]]

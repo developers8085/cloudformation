@@ -5,9 +5,10 @@ Resources:
     Type: 'AWS::CloudFormation::Stack'
     Description: VPC Creation 
     Properties:
-      TemplateURL: !Sub 'https://s3.amazonaws.com/${!Ref BucketName}/VPC.yaml'
+      TemplateURL: 'https://cloudformation-8085.s3.ap-south-1.amazonaws.com/cloudformation/ec2/vpc.yaml'
   EC2InstanceId: 
     Type: 'AWS::CloudFormation::Stack'
     Description: EC2 Instance Creation
+    DependsOn: vpcId
     Properties:
-      TemplateURL: !Sub 'https://s3.amazonaws.com/${!Ref BucketName}/ec2.yaml'
+      TemplateURL: 'https://cloudformation-8085.s3.ap-south-1.amazonaws.com/cloudformation/ec2/ec2.yaml'
