@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'AWS CloudFormation Template for subnets'
+Parameters:
+  SharedSubnetId:
+    Description: "Subnet  ID"
+    Type: String
+  pSharedRouteTableId :
+    Description : pSharedRouteTableId Id
+    Type: String
+  internetGateWay :
+    Description : InternetGateWay Id
+    Type: String
+Resources: 
+  PublicRoute: 
+    Type : AWS::EC2::Route
+    Properties: 
+      RouteTableId : !Ref pSharedRouteTableId
+      DestinationCidrBlock : 0.0.0.0/0
+      GatewayId : !Ref internetGateWay
+  Subnet1RouteTableAssociation :
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties :
+      RouteTableId : !Ref pSharedRouteTableId
+      SubnetId : !Ref SharedSubnetId

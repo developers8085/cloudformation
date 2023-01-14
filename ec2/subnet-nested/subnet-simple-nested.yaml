@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'AWS CloudFormation Template for subnets'
+Parameters:
+  VpcId: 
+    Description: VPC Id
+    Type: String
+    Default: vpc-0bb3a31bc846d0696
+  SubnetCICR: 
+    Description : Subnet CICR
+    Type: String
+    Default: 172.31.49.0/20
+  InternetGateWay :
+    Description : InternetGateWay Id
+    Type: String
+    Default: igw-062c726885f9e36f2
+Resources: 
+  SubnetId :
+    Type: AWS::CloudFormation::Stack
+    Properties :
+      TemplateURL: https://cloudformation-8085.s3.ap-south-1.amazonaws.com/cloudformation/ec2/subnet-nested.yaml
+        # Parameters:
+        #- SharedVPC: !Ref VpcId
+        #- SharedCiCr : !Ref SubnetCICR
+  RouteTable :
+    Type: AWS::CloudFormation::Stack
+    Properties :
+      TemplateURL: https://cloudformation-8085.s3.ap-south-1.amazonaws.com/cloudformation/ec2/route-table-nested.yaml
+        #Parameters:
+        #- SharedVPC: !Ref VpcId
+  Route :
+    Type: AWS::CloudFormation::Stack
+    Properties :
+      TemplateURL: https://cloudformation-8085.s3.ap-south-1.amazonaws.com/cloudformation/ec2/route-nested.yaml
+      Parameters:
+        #- SharedInternetGateWay: !Ref InternetGateWay
+        SharedSubnetId : 
+          Fn::GetAtt:
+            - SubnetId
+            - Outputs.SharedSubnetId
+          SharedRouteTableId :
+            Fn::GetAtt:
+              - RouteTable
+              - Outputs.SharedRouteTableId
+

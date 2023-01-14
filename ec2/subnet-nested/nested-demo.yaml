@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Nested Demo'
+Parameters:
+  vpcId:
+    Default: 'vpc-0bb3a31bc846d0696'
+    Description: "VPC ID"
+    Type: String
+  subnetCICR: 
+    Description : Subnet CICR
+    Type: String
+    Default: 172.31.49.0/20
+  internetGateWay :
+    Description : InternetGateWay Id
+    Type: String
+    Default: igw-062c726885f9e36f2
+Conditions:
+  Never: !Equals [ a, b ]
+Resources:
+  NullResource:
+    Type: Custom::Null
+    Condition: Never
+  publicSubnet:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cloudformation-8085.s3.ap-south-1.amazonaws.com/cloudformation/ec2/subnet-nested/subnet-nested.yaml
+      Parameters:
+        vpcId: !Ref 'vpcId'
+        subnetCICR: !Ref 'subnetCICR'
+        # internetGateWay: !Ref 'internetGateWay'
+  publicRouteTable :
+    Type: AWS::CloudFormation::Stack
+    DependsOn: publicSubnet
+    Properties :
+      TemplateURL: https://cloudformation-8085.s3.ap-south-1.amazonaws.com/cloudformation/ec2/subnet-nested/route-table-nested.yaml
+      Parameters:
+        vpcId: !Ref 'vpcId'
+  pRoute :
+    Type: AWS::CloudFormation::Stack
+    DependsOn: publicRouteTable
+    Properties :
+      TemplateURL: https://cloudformation-8085.s3.ap-south-1.amazonaws.com/cloudformation/ec2/subnet-nested/route-nested.yaml
+      Parameters:
+        SharedSubnetId :  !GetAtt publicSubnet.Outputs.SharedSubnetId
+            # Fn::GetAtt:
+            #   - publicSubnet
+            #   - Outputs.SharedSubnetId
+        pSharedRouteTableId : !GetAtt publicRouteTable.Outputs.pSharedRouteTableId
+            # Fn::GetAtt:
+            #   - publicRouteTable
+            #   - Outputs.pSharedRouteTableId
+        internetGateWay : !Ref internetGateWay

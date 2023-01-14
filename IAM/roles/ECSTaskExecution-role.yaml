@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'AWS ECS Task Execution Template Role'
+Resources:
+  rECSTaskExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName : ECSTaskExecutionRole
+      MaxSessionDuration : 43200
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+Outputs:
+  RoleArn : Fn::GetAtt rECSTaskExecutionRole.Arn
+  RoleId : Fn::GetAtt rECSTaskExecutionRole.RoleId
+

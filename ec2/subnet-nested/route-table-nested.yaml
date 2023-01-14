@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'AWS CloudFormation Template for subnets'
+Parameters:
+  vpcId: 
+    Description: VPC Id
+    Type: String
+Resources: 
+  pRouteTable: 
+    Type:  AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref vpcId
+      Tags:
+        - Key: Name
+          Value: Public Routes
+Outputs: 
+  pSharedRouteTableId :
+    Value : !Ref pRouteTable
+    Description: Route Table  Id output

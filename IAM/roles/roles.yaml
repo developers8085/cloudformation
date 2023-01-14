@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'AWS CloudFormation Template IAM Role'
+Resources:
+  rCodebuildRole:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL : https://cloudformation-8085.s3.ap-south-1.amazonaws.com/roles/codebuild/codebuild-role.yaml
+  rCloudFormationRole:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL : https://cloudformation-8085.s3.ap-south-1.amazonaws.com/roles/codebuild/cloudformation-role.yaml
+  rECSTaskExecutionRole:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL : https://cloudformation-8085.s3.ap-south-1.amazonaws.com/roles/codebuild/ECSTaskExecution-role.yaml
+      

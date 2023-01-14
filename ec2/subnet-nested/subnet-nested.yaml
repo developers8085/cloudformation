@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'AWS CloudFormation Template for subnets'
+Parameters:
+  vpcId: 
+    Description: VPC Id
+    Type: String
+      #Default: vpc-0bb3a31bc846d0696
+  subnetCICR: 
+    Description : Subnet CICR
+    Type: String
+      #Default: 172.31.49.0/20
+Resources: 
+  SubnetId :
+    Type: AWS::EC2::Subnet
+    Properties :
+      VpcId: !Ref vpcId
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref subnetCICR
+      MapPublicIpOnLaunch: false
+      Tags: 
+        - Key: Name
+          Value: Public Subnet (AZ1)
+Outputs: 
+  SharedSubnetId :
+    Value : !Ref SubnetId
+    Description: Subnet Id output
