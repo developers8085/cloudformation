@@ -1,0 +1,143 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Demo'
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+    - Label:
+        default: 'Load Balancer Parameters'
+      Parameters:
+      - LoadBalancerScheme
+      - LoadBalancerCertificateArn
+      - LoadBalancerIdleTimeout
+      - LoadBalancerDeregistrationDelay
+Parameters:
+  ParentS3StackAccessLog:
+    Description: 'Optional stack name of parent s3 stack based on state/s3.yaml template (with Access set to ElbAccessLogWrite) to store access logs.'
+    Type: String
+    Default: ''
+  LoadBalancerScheme:
+    Description: 'Indicates whether the load balancer in front of the ECS service is internet-facing or internal.'
+    Type: String
+    Default: 'internet-facing'
+    AllowedValues:
+    - 'internet-facing'
+    - internal
+  LoadBalancerIdleTimeout:
+    Description: 'The idle timeout value, in seconds.'
+    Type: Number
+    Default: 60
+    MinValue: 1
+    MaxValue: 4000
+  ALBSecurityGroup :
+    Type: 'List<AWS::EC2::SecurityGroup::Id>'
+    Description: ALB Security Group
+  ELBSubnetsPrivate:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: ELB Subnets (One AZ one Subnet Mapping)
+  ELBSubnetsPublic:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: ELB Subnets (One AZ one Subnet Mapping)  
+  HealthCheckPath:
+    Type: String
+    Default: '/'
+  VpcId:
+    Type: String
+    Default: 'vpc-0c0903aaa5c91689c'
+  LoadBalancerDeregistrationDelay:
+    Type: Number
+    Default: 10
+Conditions:
+  HasLoadBalancerSchemeInternal: !Equals [!Ref LoadBalancerScheme, 'internal']
+  HasS3Bucket: !Not [!Equals [!Ref ParentS3StackAccessLog, '']]
+Resources:
+  LoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      IpAddressType: 'ipv4'
+      LoadBalancerAttributes:
+      - Key: 'idle_timeout.timeout_seconds'
+        Value: !Ref LoadBalancerIdleTimeout
+      - Key: 'routing.http2.enabled'
+        Value: 'true'
+      Scheme: !Ref LoadBalancerScheme
+      SecurityGroups: !Ref ALBSecurityGroup
+      Subnets: !Ref ELBSubnetsPublic
+  LoadBalancerListenerHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+            - Type: forward
+              TargetGroupArn: !Ref DefaultTargetGroup
+  # LambdaListerRule:
+  #   Type: AWS::ElasticLoadBalancingV2::ListenerRule
+  #   Properties:
+  #     Actions: 
+  #       - Type: forward
+  #         TargetGroupArn: !Ref LambdaTargetGroup
+  #     Conditions:
+  #       - Field: path-pattern
+  #         PathPatternConfig: 
+  #           Values: 
+  #             - '/lambda'
+  #     ListenerArn: !Ref LoadBalancer
+  #     Priority: 1
+  ListenerRule1:
+    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref LambdaTargetGroup1
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            # HttpHeaderName: User-Agent
+            Values:
+              - '/Mozilla'
+      ListenerArn: !Ref LoadBalancerListenerHTTP
+      Priority: 1
+  ListenerRule2:
+    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref LambdaTargetGroup2
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            # HttpHeaderName: User-Agent
+            Values:
+              - '/Chrome'
+      ListenerArn: !Ref LoadBalancerListenerHTTP
+      Priority: 2
+  DefaultTargetGroup: 
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      HealthCheckIntervalSeconds: 15
+      HealthCheckPath: !Ref HealthCheckPath
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      Matcher:
+        HttpCode: '200-299'
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref VpcId
+      TargetGroupAttributes:
+      - Key: deregistration_delay.timeout_seconds
+        Value: !Ref LoadBalancerDeregistrationDelay
+  LambdaTargetGroup1: 
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: LambdaTargetGroup
+      HealthCheckPath: !Ref HealthCheckPath
+      TargetType: lambda
+  LambdaTargetGroup2: 
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: LambdaTargetGroup2
+      HealthCheckPath: !Ref HealthCheckPath
+      TargetType: lambda
